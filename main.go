@@ -1,7 +1,17 @@
 package main;
 
-import ("fmt");
+import (
+	"rakamin/routes"
+	"fmt"
+);
 
 func main() {
-	fmt.Println("Hello, World!")
+
+	route := routes.SetupRouter();
+	
+	port := 8080;
+	address := fmt.Sprintf("localhost:%d", port);
+	fmt.Println("Server running on ", address);
+	
+	route.Run(address);
 }

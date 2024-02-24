@@ -1,4 +1,4 @@
-module rakamin
+module github.com/dennistandelon/task-5-pbi-fullstack-developer-DennisTandelon
 
 go 1.21.6
 

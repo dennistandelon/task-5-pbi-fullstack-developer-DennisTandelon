@@ -2,8 +2,8 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"rakamin/controllers"
-	"rakamin/middlewares"
+	"github.com/dennistandelon/task-5-pbi-fullstack-developer-DennisTandelon/controllers"
+	"github.com/dennistandelon/task-5-pbi-fullstack-developer-DennisTandelon/middlewares"
 )
 
 func SetupRouter() *gin.Engine {
@@ -19,7 +19,7 @@ func SetupRouter() *gin.Engine {
 	auth_route.Use(middlewares.JwtCheck())
 	{
 		// User Route
-		auth_route.POST("/users/:id", controllers.UpdateUser)
+		auth_route.PUT("/users/:id", controllers.UpdateUser)
 		auth_route.DELETE("/users/:id", controllers.DeleteUser)
 		
 		// Photo Route

@@ -1,7 +1,7 @@
 package main;
 
 import (
-	"rakamin/routes"
+	"github.com/dennistandelon/task-5-pbi-fullstack-developer-DennisTandelon/routes"
 	"fmt"
 );
 

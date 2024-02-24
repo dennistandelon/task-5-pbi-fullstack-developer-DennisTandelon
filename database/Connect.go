@@ -5,7 +5,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/driver/mysql"
 	"github.com/joho/godotenv"
-	"rakamin/models"
+	"github.com/dennistandelon/task-5-pbi-fullstack-developer-DennisTandelon/models"
 )
 
 var (globalInstance *gorm.DB)

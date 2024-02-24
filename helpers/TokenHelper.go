@@ -2,7 +2,7 @@ package helpers
 
 import (
 	"github.com/dgrijalva/jwt-go"
-	"rakamin/models"
+	"github.com/dennistandelon/task-5-pbi-fullstack-developer-DennisTandelon/models"
 	"time"
 	"fmt"
 	"os"

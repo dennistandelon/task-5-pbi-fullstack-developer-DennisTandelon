@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"net/http"
-	"rakamin/app"
-	"rakamin/database"
-	"rakamin/models"
+	"github.com/dennistandelon/task-5-pbi-fullstack-developer-DennisTandelon/app"
+	"github.com/dennistandelon/task-5-pbi-fullstack-developer-DennisTandelon/database"
+	"github.com/dennistandelon/task-5-pbi-fullstack-developer-DennisTandelon/models"
 	"github.com/gin-gonic/gin"
 )
 
@@ -60,7 +60,7 @@ func GetPhoto(context *gin.Context){
 	}
 	
 	var photos []models.Photo 
-	conn.First(&photos)
+	conn.Find(&photos)
 
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"result":photos,

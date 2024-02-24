@@ -2,11 +2,10 @@ package middlewares
 
 import (
 	"net/http"
-	"rakamin/database"
-	"rakamin/helpers"
-	"rakamin/models"
+	"github.com/dennistandelon/task-5-pbi-fullstack-developer-DennisTandelon/database"
+	"github.com/dennistandelon/task-5-pbi-fullstack-developer-DennisTandelon/helpers"
+	"github.com/dennistandelon/task-5-pbi-fullstack-developer-DennisTandelon/models"
 	"time"
-
 	"github.com/gin-gonic/gin"
 )
 

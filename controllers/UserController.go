@@ -2,11 +2,12 @@ package controllers
 
 import (
 	"net/http"
-	"rakamin/app"
-	"rakamin/database"
-	"rakamin/helpers"
-	"rakamin/models"
-
+	"github.com/dennistandelon/task-5-pbi-fullstack-developer-DennisTandelon/app"
+	"github.com/dennistandelon/task-5-pbi-fullstack-developer-DennisTandelon/database"
+	"github.com/dennistandelon/task-5-pbi-fullstack-developer-DennisTandelon/helpers"
+	"github.com/dennistandelon/task-5-pbi-fullstack-developer-DennisTandelon/models"
+	"strconv"
+	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 )
 
@@ -36,7 +37,39 @@ func Register(context *gin.Context) {
 		Password: helpers.EncryptPassword(newUser.Password),
 	}
 
-	conn.Create(&insertUser)
+	_, error = govalidator.ValidateStruct(insertUser)
+
+	if error != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  400,
+			"message": error.Error(),
+		})
+		return
+	}
+
+	var checkEmail models.User
+	conn.Where("email = ?", newUser.Email).First(&checkEmail)
+
+	var checkUsername models.User
+	conn.Where("username = ?", newUser.Username).First(&checkUsername)
+
+	if checkEmail.Email != "" || checkUsername.Username != "" {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  400,
+			"message": "Username or Email already exist",
+		})
+		return
+	}
+	
+	result := conn.Create(&insertUser)
+
+	if result.Error != nil {
+		context.AbortWithStatusJSON(http.StatusBadGateway, gin.H{
+			"status":  404,
+			"message": "Username or Email already exist",
+		})
+		return
+	}
 
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"status":  200,
@@ -124,24 +157,37 @@ func UpdateUser(context *gin.Context) {
 	updateID := context.Param("id")
 
 	var newUser app.UserData
-	if error := context.BindJSON(&newUser); error != nil {
+	if error := context.ShouldBindJSON(&newUser); error != nil {
 		context.AbortWithStatusJSON(http.StatusBadGateway, gin.H{
 			"status":  404,
 			"message": "Invalid credentials",
 		})
 		return
 	}
-	
+
 	userData := context.MustGet("user").(models.User)
+
+	if strconv.Itoa(userData.ID) != updateID {
+		context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"status":  401,
+			"message": "You dont have access to update this user",
+		})
+		return
+	}
 
 	var user models.User
 	conn.Where("id = ?", updateID).First(&user)
 
+	var checkEmail models.User
+	conn.Where("email = ?", newUser.Email).First(&checkEmail)
 
-	if user.ID == userData.ID{
-		context.AbortWithStatusJSON(http.StatusUnauthorized,gin.H{
-			"status":401,
-			"message":"You dont have access to delete this photo",
+	var checkUsername models.User
+	conn.Where("username = ?", newUser.Username).First(&checkUsername)
+
+	if checkEmail.Email != "" || checkUsername.Username != "" {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  400,
+			"message": "Username or Email already exist",
 		})
 		return
 	}
@@ -150,10 +196,25 @@ func UpdateUser(context *gin.Context) {
 	user.Email = newUser.Email
 	user.Password = helpers.EncryptPassword(newUser.Password)
 
+	_, error = govalidator.ValidateStruct(user)
+
+	if error != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"status":  400,
+			"message": error.Error(),
+		})
+		return
+	}
+
+	conn.Save(&user)
+
+	context.SetCookie("Authorization", "", -1, "", "", true, true)
+
 	context.IndentedJSON(http.StatusOK, gin.H{
 		"status":  200,
-		"message": "Successfully update user",
+		"message": "Successfully update user, please login to related user if you want continue update the user",
 	})
+
 }
 
 func DeleteUser(context *gin.Context) {
@@ -175,17 +236,21 @@ func DeleteUser(context *gin.Context) {
 
 	userData := context.MustGet("user").(models.User)
 
-	if user.ID == userData.ID{
-		context.AbortWithStatusJSON(http.StatusUnauthorized,gin.H{
-			"status":401,
-			"message":"You dont have access to delete this photo",
+	if strconv.Itoa(userData.ID) != deleteID {
+		context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"status":  401,
+			"message": "You dont have access to delete this user, please login to related user if you want continue delete the user",
 		})
 		return
 	}
 
 	conn.Delete(&user)
 
+	context.SetCookie("Authorization", "", -1, "", "", true, true)
+
 	context.IndentedJSON(http.StatusOK, gin.H{
-		"message": "delete user",
+		"status":  200,
+		"message": "Successfully delete this user, please register or login again to continue",
 	})
+
 }
